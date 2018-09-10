@@ -36,6 +36,7 @@ All three methods supports the following arguments:
 
 label
 : text for the label (left) part. Can also be given as keyword argument `label=<text>`
+
 value
 : text for the value (right) part. Can also be given as keyword argument `value=<text>`
 
@@ -43,26 +44,37 @@ value
 
 border_radius
 : how rounded the corners of the badge should be (CSS "padding")
+
 label
 : the text in label part of the badge
+
 label_background
 : background color for the label (left) part (CSS "background")
+
 label_text_color
 : text color for the label (left) part (CSS "text-color")
+
 label_text_shadow
 : configuration for the text shadow (CSS "text-shadow")
+
 font_family
 : font to use in the badge (CSS "font-family")
+
 padding
 : amount of space between the border and the text (CSS "padding")
+
 thresholds
 : dict with value to `value_background` mappings. See Thresholds below
+
 value
 : the text in the value part of the badge
+
 value_background
 : background color for the label (left) part (CSS "background")
+
 value_text_color
 : text color for the label (left) part (CSS "text-color")
+
 value_text_shadow
 : configuration for the text shadow (CSS "text-shadow")
 
