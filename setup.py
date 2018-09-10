@@ -1,10 +1,13 @@
 from setuptools import setup
 
+with open('README.rst') as fp:
+    readme = fp.read()
+
 setup(
     name='badge',
     description='Generate badges/shields with pure HTML/CSS.',
-    long_description='',
-    version='0.1.0',
+    long_description=readme,
+    version='0.2.0',
     url='https://github.com/Gustra/abadge',
     author='Gunnar Strand',
     author_email='Gurra.Strand@gmail.com',
