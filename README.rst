@@ -49,7 +49,7 @@ Optional arguments
 
 :*value*:
     text for the value (right) part. Can also be given as keyword argument
-   ``value=<text>``
+    ``value=<text>``
 
 Keyword arguments
 .................
