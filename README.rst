@@ -1,5 +1,5 @@
- abadge
-========
+abadge
+======
 
 Generate status badges/shields of pure HTML+CSS.
 
@@ -57,6 +57,10 @@ Keyword arguments
 :``border_radius``:
     how rounded the corners of the badge should be (CSS "``padding``")
 
+:``font_family``: font to use in the badge (CSS "``font-family``")
+
+:``font_size``: font size to use in the badge (CSS "``font-size``")
+
 :``label``: the text in label part of the badge
 
 :``label_background``:
@@ -68,7 +72,8 @@ Keyword arguments
 :``label_text_shadow``:
     configuration for the text shadow (CSS "``text-shadow``")
 
-:``font_family``: font to use in the badge (CSS "``font-family``")
+:``link_decoration``:
+    decoration for the link (CSS "``text-decoration``")
 
 :``padding``:
     amount of space between the border and the text (CSS "``padding``")

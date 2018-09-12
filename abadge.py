@@ -48,12 +48,13 @@ class Badge(object):
     """
     config = {
         'border_radius': '4px',
+        'font_family': 'DejaVu Sans, Verdana, sans',
+        'font_size': '80%',
         'label': '',
         'label_background': '#444',
         'label_text_color': 'white',
         'label_text_shadow': '1px 1px black',
-        'font_family': 'DejaVu Sans, Verdana, sans',
-        'font_size': '80%',
+        'link_decoration': 'none',
         'padding': '4px 8px 4px 8px',
         'thresholds': {},
         'url': '',
@@ -82,7 +83,8 @@ class Badge(object):
                'text-shadow:{value_text_shadow};' \
                '">{value}</span>'
 
-    href_template = '<a href="{url}">'
+    href_template = '<a href="{url}"' \
+                    ' style="text-decoration:{link_decoration};">'
 
     def __init__(self, *args, **kwargs):
         """
@@ -98,16 +100,24 @@ class Badge(object):
         Keyword arguments:
         border_radius -- how rounded the corners of the badge should be
                         (CSS "padding")
+        font_family -- font to use in the badge (CSS "font-family")
+        font_size -- size of the font (CSS "font-size")
         label -- the text in label part of the badge
         label_background -- background color for the label (left) part
                         (CSS "background")
         label_text_color -- text color for the label (left) part
                         (CSS "text-color")
-        font_family -- font to use in the badge (CSS "font-family")
+        label_text_shadow -- text shadow for the label part (CSS "text-color")
+        link_decoration -- the CSS "text-decoration" setting for the link
         padding -- amount of space between the border and the badge
                    (CSS "padding")
-        text_shadow -- configuration for the text shadow (CSS "text-shadow")
+        thresholds -- threshold configuration
+        url -- make the badge link to the set URL
         value -- the value part of the badge
+        value_background -- background color for the value part
+                        (CSS "background")
+        value_text_color -- text color for the value part (CSS "text-color")
+        value_text_shadow -- text shadow for the value part (CSS "text-shadow")
         """
         self.config.update(self._parse_args(args, kwargs))
         if len(args) > 0:

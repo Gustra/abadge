@@ -54,7 +54,7 @@ class BadgeTester(unittest.TestCase):
         badge = Badge(**config)
 
         self.assertEqual(
-            '<a href="foobar">'
+            '<a href="foobar" style="text-decoration:none;">'
             '<span style="background:#555;border-radius:6px 0px 0px 6px;'
             'color:black;font-family:mono;font-size:90%;'
             'padding:5px 5px 5px 9px;'
@@ -67,7 +67,7 @@ class BadgeTester(unittest.TestCase):
             badge.to_html())
 
         self.assertEqual(
-            '<a href="foobar">'
+            '<a href="foobar" style="text-decoration:golden;">'
             '<span style="background:overridden;border-radius:6px 0px 0px 6px;'
             'color:black;font-family:mono;font-size:90%;'
             'padding:5px 5px 5px 9px;'
@@ -77,12 +77,13 @@ class BadgeTester(unittest.TestCase):
             'padding:5px 5px 5px 9px;'
             'text-shadow:3px 3px red;">bar</span>'
             '</a>',
-            badge.to_html(label_background='overridden'))
+            badge.to_html(label_background='overridden',
+                          link_decoration='golden'))
 
         badge = Badge('flip', 'flop', **config)
 
         self.assertEqual(
-            '<a href="foobar">'
+            '<a href="foobar" style="text-decoration:none;">'
             '<span style="background:#555;border-radius:6px 0px 0px 6px;'
             'color:black;font-family:mono;font-size:90%;'
             'padding:5px 5px 5px 9px;'
