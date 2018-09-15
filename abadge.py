@@ -55,6 +55,7 @@ class Badge(object):
         'label_text_color': 'white',
         'label_text_shadow': '1px 1px black',
         'link_decoration': 'none',
+        'link_target': '',
         'padding': '4px 8px 4px 8px',
         'thresholds': {},
         'url': '',
@@ -83,7 +84,7 @@ class Badge(object):
                'text-shadow:{value_text_shadow};' \
                '">{value}</span>'
 
-    href_template = '<a href="{url}"' \
+    href_template = '<a href="{url}"{link_target}' \
                     ' style="text-decoration:{link_decoration};">'
 
     def __init__(self, *args, **kwargs):
@@ -109,6 +110,7 @@ class Badge(object):
                         (CSS "text-color")
         label_text_shadow -- text shadow for the label part (CSS "text-color")
         link_decoration -- the CSS "text-decoration" setting for the link
+        link_target -- set the "target" attribute for the link
         padding -- amount of space between the border and the badge
                    (CSS "padding")
         thresholds -- threshold configuration
@@ -166,8 +168,13 @@ class Badge(object):
             config['value'] = args[1]
         config['value_background'] = self._get_value_background(config)
         if config['url']:
-            return self.href_template.format(**config) \
-                   + self.template.format(**config) + '</a>'
+            if config['link_target']:
+                target = config['link_target']
+                config['link_target'] = ' target="{}"'.format(target)
+                if target == '_blank':
+                    config['link_target'] += ' rel="noopener noreferer"'
+            return (self.href_template.format(**config)
+                    + self.template.format(**config) + '</a>')
         return self.template.format(**config)
 
     @classmethod

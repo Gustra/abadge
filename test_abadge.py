@@ -117,3 +117,11 @@ class BadgeTester(unittest.TestCase):
                                                 value='c',
                                                 value_background='cc'),
             result)
+
+    def test_link_target(self):
+        badge = Badge.make_badge(url='foobar', link_target="_new")
+        self.assertRegex(badge, '^<a href="foobar" target="_new" ')
+
+        badge = Badge.make_badge(url='foobar', link_target="_blank")
+        self.assertRegex(badge, '^<a href="foobar" target="_blank"'
+                                ' rel="noopener noreferer" ')
