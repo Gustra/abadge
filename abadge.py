@@ -4,6 +4,7 @@ abadge - generate badges/shields with pure HTML/CSS.
 
 
 """
+from copy import deepcopy
 
 label_css = '''
     background: #444;
@@ -46,7 +47,7 @@ class Badge(object):
         print(Badge.make_badge(tests, '4/8'))               # This too
 
     """
-    config = {
+    default_config = {
         'border_radius': '4px',
         'font_family': 'DejaVu Sans, Verdana, sans',
         'font_size': '80%',
@@ -60,7 +61,8 @@ class Badge(object):
         'thresholds': {},
         'url': '',
         'value': '',
-        'value_background': '#444',
+        'value_background': '#888',
+        'value_backgrounds': {},
         'value_text_color': 'white',
         'value_text_shadow': '1px 1px black',
     }
@@ -118,9 +120,12 @@ class Badge(object):
         value -- the value part of the badge
         value_background -- background color for the value part
                         (CSS "background")
+        value_backgrounds -- dict with value to color mapping for the value
+                        part (CSS "background"). Overrides ``value_background``
         value_text_color -- text color for the value part (CSS "text-color")
         value_text_shadow -- text shadow for the value part (CSS "text-shadow")
         """
+        self.config = deepcopy(self.default_config)
         self.config.update(self._parse_args(args, kwargs))
         if len(args) > 0:
             self.config['label'] = args[0]
@@ -138,7 +143,7 @@ class Badge(object):
             raise ValueError('a maximum of 2 optional argument may be given'
                              ' ({} were given.)'.format(len(args)))
         for k in kwargs.keys():
-            if k not in cls.config:
+            if k not in cls.default_config:
                 raise TypeError('unknown option {}'.format(k))
         return kwargs
 
@@ -150,9 +155,16 @@ class Badge(object):
         :param config: the config dict
         :return: color string
         """
-        if 'thresholds' in config:
-            return config['thresholds'].get(config['value'],
-                                            config['value_background'])
+        try:
+            return config['thresholds'][config['label']][config['value']]
+        except KeyError:
+            pass
+
+        try:
+            return config['value_backgrounds'][config['value']]
+        except KeyError:
+            pass
+
         return config['value_background']
 
     def to_html(self, *args, **kwargs):
@@ -160,22 +172,22 @@ class Badge(object):
         Render HTML for this badge
         :return: string with HTML
         """
-        config = self.config.copy()
-        config.update(self._parse_args(args, kwargs))
+        conf = deepcopy(self.config)
+        conf.update(self._parse_args(args, kwargs))
         if len(args) > 0:
-            config['label'] = args[0]
+            conf['label'] = args[0]
         if len(args) > 1:
-            config['value'] = args[1]
-        config['value_background'] = self._get_value_background(config)
-        if config['url']:
-            if config['link_target']:
-                target = config['link_target']
-                config['link_target'] = ' target="{}"'.format(target)
+            conf['value'] = args[1]
+        conf['value_background'] = self._get_value_background(conf)
+        if conf['url']:
+            if conf['link_target']:
+                target = conf['link_target']
+                conf['link_target'] = ' target="{}"'.format(target)
                 if target == '_blank':
-                    config['link_target'] += ' rel="noopener noreferer"'
-            return (self.href_template.format(**config)
-                    + self.template.format(**config) + '</a>')
-        return self.template.format(**config)
+                    conf['link_target'] += ' rel="noopener noreferer"'
+            return (self.href_template.format(**conf)
+                    + self.template.format(**conf) + '</a>')
+        return self.template.format(**conf)
 
     @classmethod
     def make_badge(cls, *args, **kwargs):

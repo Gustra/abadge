@@ -79,15 +79,21 @@ Keyword arguments
     amount of space between the border and the text (CSS "``padding``")
 
 :``thresholds``:
-    dict with *value* to ``value_background`` mappings. See `Thresholds`_
-    below
+    dict with *label* to *value* to ``value_background`` mappings. See
+    `Thresholds`_ below
 
 :``url``: makes the badge link to the given URL
 
 :``value``: the text in the value part of the badge
 
 :``value_background``:
-    background color for the value part (CSS "``background``")
+    background color for the value part (CSS "``background``"). This is also
+    the final fallback if the value is neither found in ``thresholds`` nor in
+    ``value_backgrounds``
+
+:``value_backgrounds``:
+    dict with *value* to ``value_background`` mappings. See `Thresholds`_
+    below
 
 :``value_text_color``: text color for the value part (CSS "``color``")
 
@@ -97,15 +103,32 @@ Keyword arguments
 Thresholds
 ''''''''''
 
-The ``thresholds`` argument is a dict with simple value to background color
-mapping::
+The ``thresholds`` argument is a dict with label to value to background
+color mapping::
 
-    build_badge = Badge(thresholds={'SUCCESS': '#0f0',
-                                    'FAILURE': '#f00',
-                                    'UNSTABLE': '#ff0',
-                                    'ABORTED': '#f80',})
+    build_badge = Badge(thresholds={'build': {'SUCCESS': '#0f0',
+                                              'FAILURE': '#f00',
+                                              'UNSTABLE': '#ff0',
+                                              'ABORTED': '#f80',},
+                                    'KPI': {'A': '#0f4',
+                                            'B': '#f04',
+                                            'C': '#f84',
+                                            'D': '#ff4',},)
     print(build_badge('build', job.get_status()))
     # Using a non-existing value will use the value_background color
     print(build_badge('build', 'SKIP'))
     print(build_badge('build', 'HOP', value_background='#888'))
+
+If the background is not found in ``thresholds`` then the value will be looked
+up in the ``value_backgrounds`` dict as a fallback::
+
+    build_badge = Badge(thresholds={'build': {'SUCCESS': '#0f0',
+                                              'FAILURE': '#f00',
+                                              'UNSTABLE': '#ff0',
+                                              'ABORTED': '#f80',}}
+                        value_backgrounds: {'SUCCESS': '#0f4',
+                                            'FAILURE': '#f04',
+                                            'UNSTABLE': '#f84',
+                                            'ABORTED': '#ff4',},)
+    print(build_badge('test', job.get_status()))
 

@@ -31,7 +31,7 @@ class BadgeTester(unittest.TestCase):
         self.assertEqual(
             self.default_config_template.format(label='foo',
                                                 value='bar',
-                                                value_background='#444',
+                                                value_background='#888',
                                                 value_text_color='white'),
             result)
 
@@ -95,8 +95,8 @@ class BadgeTester(unittest.TestCase):
             '</a>',
             badge.to_html())
 
-    def test_levels(self):
-        badge = Badge(thresholds={'a': 'ac', 'b': 'bc', 'c': 'cc'})
+    def test_backgrounds(self):
+        badge = Badge(value_backgrounds={'a': 'ac', 'b': 'bc', 'c': 'cc'})
         result = badge.to_html('foo', 'a')
         self.assertEqual(
             self.default_config_template.format(label='foo',
@@ -116,6 +116,31 @@ class BadgeTester(unittest.TestCase):
             self.default_config_template.format(label='baz',
                                                 value='c',
                                                 value_background='cc'),
+            result)
+
+    def test_thresholds(self):
+        badge = Badge(thresholds={'foo': {'a': 'ac'},
+                                  'bar': {'b': 'bc'}, },
+                      value_backgrounds={'u': 'uc'})
+        result = badge.to_html('foo', 'a')
+        self.assertEqual(
+            self.default_config_template.format(label='foo',
+                                                value='a',
+                                                value_background='ac'),
+            result)
+
+        result = badge.to_html('bar', 'b')
+        self.assertEqual(
+            self.default_config_template.format(label='bar',
+                                                value='b',
+                                                value_background='bc'),
+            result)
+
+        result = badge.to_html('baz', 'u')
+        self.assertEqual(
+            self.default_config_template.format(label='baz',
+                                                value='u',
+                                                value_background='uc'),
             result)
 
     def test_link_target(self):
