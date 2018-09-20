@@ -137,18 +137,18 @@ Examples::
                                         'colors': {'SUCCESS': '#0f0',
                                                    'FAILURE': '#f00',
                                                    'UNSTABLE': '#ff0',
-                                                   'ABORTED': '#f80',},
+                                                   'ABORTED': '#f80',}},
                                     'KPI': {
                                         'order': 'str',
                                         'colors': {'A': '#0f4',
                                                    'B': '#f04',
                                                    'C': '#f84',
-                                                   'D': '#ff4',},
+                                                   'D': '#ff4',}},
                                     'passrate': {
                                         'colors': {0.3: '#f00',
                                                    0.6: '#c40',
                                                    0.8: '#4c0',},
-                                        'above': '#0f0',})
+                                        'above': '#0f0',}})
 
     print(build_badge('build', job.get_status()).to_html())
     # Using a non-existing value will use the value_background color
