@@ -148,6 +148,28 @@ class Badge(object):
         return kwargs
 
     @classmethod
+    def _determine_type(cls, values):
+        is_float = False
+        for value in values:
+            try:
+                float(value)
+                if '.' in str(value):
+                    is_float = True
+            except ValueError:
+                return 'str'
+        return 'float' if is_float else 'int'
+
+    @classmethod
+    def _get_caster_func(cls, order, thresholds):
+        value_type = cls._determine_type(list(thresholds['colors'].keys()))
+        if order == 'auto' and value_type == 'str':
+            return None
+        casters = {'str': lambda s: str(s),
+                   'int': lambda i: int(i),
+                   'float': lambda f: float(f), }
+        return casters[order]
+
+    @classmethod
     def _get_value_background(cls, config):
         """
         Return the calculated background color based on the "value" key.
@@ -156,7 +178,18 @@ class Badge(object):
         :return: color string
         """
         try:
-            return config['thresholds'][config['label']][config['value']]
+            this = config['thresholds'][config['label']]
+            order = this.get('order', 'auto')
+            if order != 'strict':
+                caster = cls._get_caster_func(order, this)
+                if caster:
+                    thresholds = sorted(list(this['colors'].keys()),
+                                        key=lambda v: caster(v))
+                    for threshold in thresholds:
+                        if caster(config['value']) <= caster(threshold):
+                            return this['colors'][threshold]
+                    return this['above']
+            return this['colors'][config['value']]
         except KeyError:
             pass
 

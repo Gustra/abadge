@@ -118,9 +118,9 @@ class BadgeTester(unittest.TestCase):
                                                 value_background='cc'),
             result)
 
-    def test_thresholds(self):
-        badge = Badge(thresholds={'foo': {'a': 'ac'},
-                                  'bar': {'b': 'bc'}, },
+    def test_single_thresholds(self):
+        badge = Badge(thresholds={'foo': {'colors': {'a': 'ac'}},
+                                  'bar': {'colors': {'b': 'bc'}}, },
                       value_backgrounds={'u': 'uc'})
         result = badge.to_html('foo', 'a')
         self.assertEqual(
@@ -141,6 +141,108 @@ class BadgeTester(unittest.TestCase):
             self.default_config_template.format(label='baz',
                                                 value='u',
                                                 value_background='uc'),
+            result)
+
+    def test_comparing_thresholds(self):
+        badge = Badge(thresholds={'foo': {'colors': {'a': 'ac'},
+                                          'order': 'str',
+                                          'above': 'xc', },
+                                  'bar': {'order': 'str',
+                                          'colors': {'b': 'bc',
+                                                     'd': 'dc', }},
+                                  'baz': {'order': 'int',
+                                          'colors': {1: '1c',
+                                                     3: '3c', },
+                                          'above': 'xc', },
+                                  'boz': {'order': 'float',
+                                          'colors': {1.1: '1.1c',
+                                                     3.2: '3.2c', },
+                                          'above': 'xc', },
+                                  },
+                      value_backgrounds={'u': 'uc'})
+        # Strings
+        result = badge.to_html('foo', 'a')
+        self.assertEqual(
+            self.default_config_template.format(label='foo',
+                                                value='a',
+                                                value_background='ac'),
+            result)
+        result = badge.to_html('foo', 'b')
+        self.assertEqual(
+            self.default_config_template.format(label='foo',
+                                                value='b',
+                                                value_background='xc'),
+            result)
+
+        result = badge.to_html('bar', 'a')
+        self.assertEqual(
+            self.default_config_template.format(label='bar',
+                                                value='a',
+                                                value_background='bc'),
+            result)
+        result = badge.to_html('bar', 'b')
+        self.assertEqual(
+            self.default_config_template.format(label='bar',
+                                                value='b',
+                                                value_background='bc'),
+            result)
+        result = badge.to_html('bar', 'u')
+        self.assertEqual(
+            self.default_config_template.format(label='bar',
+                                                value='u',
+                                                value_background='uc'),
+            result)
+
+        # Integers
+        result = badge.to_html('baz', 0)
+        self.assertEqual(
+            self.default_config_template.format(label='baz',
+                                                value='0',
+                                                value_background='1c'),
+            result)
+        result = badge.to_html('baz', 1)
+        self.assertEqual(
+            self.default_config_template.format(label='baz',
+                                                value='1',
+                                                value_background='1c'),
+            result)
+        result = badge.to_html('baz', 2)
+        self.assertEqual(
+            self.default_config_template.format(label='baz',
+                                                value='2',
+                                                value_background='3c'),
+            result)
+        result = badge.to_html('baz', 4)
+        self.assertEqual(
+            self.default_config_template.format(label='baz',
+                                                value='4',
+                                                value_background='xc'),
+            result)
+
+        # Floats
+        result = badge.to_html('boz', 0.5)
+        self.assertEqual(
+            self.default_config_template.format(label='boz',
+                                                value='0.5',
+                                                value_background='1.1c'),
+            result)
+        result = badge.to_html('boz', 1.01)
+        self.assertEqual(
+            self.default_config_template.format(label='boz',
+                                                value='1.01',
+                                                value_background='1.1c'),
+            result)
+        result = badge.to_html('boz', 1.11)
+        self.assertEqual(
+            self.default_config_template.format(label='boz',
+                                                value='1.11',
+                                                value_background='3.2c'),
+            result)
+        result = badge.to_html('boz', 4)
+        self.assertEqual(
+            self.default_config_template.format(label='boz',
+                                                value='4',
+                                                value_background='xc'),
             result)
 
     def test_link_target(self):

@@ -10,8 +10,8 @@ Overview
 
 The ``Badge`` class in the module is used to generate status badges. It
 supports various configuration options like font, background etc., and also
-includes rudimentary threshold support, which is useful for presenting job
-status, for example.
+includes threshold support, which is useful for presenting job status, for
+example.
 
 Usage
 -----
@@ -79,8 +79,8 @@ Keyword arguments
     amount of space between the border and the text (CSS "``padding``")
 
 :``thresholds``:
-    dict with *label* to *value* to ``value_background`` mappings. See
-    `Thresholds`_ below
+    dict with *label*-specific configuration options, so that multiple labels
+    can be handled by the same class instance. See `Thresholds`_ below
 
 :``url``: makes the badge link to the given URL
 
@@ -103,29 +103,67 @@ Keyword arguments
 Thresholds
 ''''''''''
 
-The ``thresholds`` argument is a dict with label to value to background
-color mapping::
+The ``thresholds`` argument is a dict with label as key and a configuration
+dict as value. The dict supports the following keys:
 
-    build_badge = Badge(thresholds={'build': {'SUCCESS': '#0f0',
-                                              'FAILURE': '#f00',
-                                              'UNSTABLE': '#ff0',
-                                              'ABORTED': '#f80',},
-                                    'KPI': {'A': '#0f4',
-                                            'B': '#f04',
-                                            'C': '#f84',
-                                            'D': '#ff4',},)
-    print(build_badge('build', job.get_status()))
+:``order``:
+    May be: ``auto``, ``float``, ``int``, ``str``, or ``strict``, with ``auto``
+    being the default if ``order`` does not exist. ``float``, ``int`` and
+    ``str`` forces level of that type (see below). ``auto`` uses ordering of
+    type *float* or *int* if all *values* in ``colors`` are numbers type, with
+    ``float`` taking precedence. If ``auto`` is set and at least one value is a
+    string, or if ``strict`` is set, then an exact match is used for
+    determining color, ie. no ordering
+
+:``colors``:
+    dict with *value* to *color* mapping
+
+:``above``:
+    Value is a color. if an ordering is requested, and the given value is above
+    the highest value (key) in ``colors``, then this color is used
+
+Levels are handled by sorting the keys in the ``colors`` dict and comparing
+the incoming value to each of the keys, starting with the key with the lowest
+value, until the value is lower than or equal to the key::
+
+    for k in sorted(thresholds['colors'].keys, key=<sort by type>):
+        if value <= k:
+            return thresholds['colors'][k]
+    return thresholds['above']
+
+Examples::
+
+    build_badge = Badge(thresholds={'build': {
+                                        'colors': {'SUCCESS': '#0f0',
+                                                   'FAILURE': '#f00',
+                                                   'UNSTABLE': '#ff0',
+                                                   'ABORTED': '#f80',},
+                                    'KPI': {
+                                        'order': 'str',
+                                        'colors': {'A': '#0f4',
+                                                   'B': '#f04',
+                                                   'C': '#f84',
+                                                   'D': '#ff4',},
+                                    'passrate': {
+                                        'colors': {0.3: '#f00',
+                                                   0.6: '#c40',
+                                                   0.8: '#4c0',},
+                                        'above': '#0f0',})
+
+    print(build_badge('build', job.get_status()).to_html())
     # Using a non-existing value will use the value_background color
-    print(build_badge('build', 'SKIP'))
-    print(build_badge('build', 'HOP', value_background='#888'))
+    print(build_badge('build', 'SKIP').to_html())
+    print(build_badge('build', 'HOP', value_background='#888').to_html())
+    print(build_badge('passrate', test_passrate).to_html())
 
-If the background is not found in ``thresholds`` then the value will be looked
+If the color is not found in ``thresholds`` then the value will be looked
 up in the ``value_backgrounds`` dict as a fallback::
 
-    build_badge = Badge(thresholds={'build': {'SUCCESS': '#0f0',
-                                              'FAILURE': '#f00',
-                                              'UNSTABLE': '#ff0',
-                                              'ABORTED': '#f80',}}
+    build_badge = Badge(thresholds={'build': {
+                                        'colors': {'SUCCESS': '#0f0',
+                                                   'FAILURE': '#f00',
+                                                   'UNSTABLE': '#ff0',
+                                                   'ABORTED': '#f80',}}},
                         value_backgrounds: {'SUCCESS': '#0f4',
                                             'FAILURE': '#f04',
                                             'UNSTABLE': '#f84',
