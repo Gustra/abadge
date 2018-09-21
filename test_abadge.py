@@ -245,6 +245,36 @@ class BadgeTester(unittest.TestCase):
                                                 value_background='xc'),
             result)
 
+    def test_shading(self):
+        badge = Badge(thresholds={'foo': {'colors': {1: '#e0c0a0',
+                                                     5: '#888'},
+                                          'shade': True},
+                                  })
+        result = badge.to_html('foo', '1')
+        self.assertEqual(
+            self.default_config_template.format(label='foo',
+                                                value='1',
+                                                value_background='#e0c0a0'),
+            result)
+        result = badge.to_html('foo', '3')
+        self.assertEqual(
+            self.default_config_template.format(label='foo',
+                                                value='3',
+                                                value_background='#b0a090'),
+            result)
+        result = badge.to_html('foo', '4')
+        self.assertEqual(
+            self.default_config_template.format(label='foo',
+                                                value='4',
+                                                value_background='#989088'),
+            result)
+        result = badge.to_html('foo', '5')
+        self.assertEqual(
+            self.default_config_template.format(label='foo',
+                                                value='5',
+                                                value_background='#808080'),
+            result)
+
     def test_link_target(self):
         badge = Badge.make_badge(url='foobar', link_target="_new")
         self.assertRegex(badge, '^<a href="foobar" target="_new" ')

@@ -167,7 +167,48 @@ class Badge(object):
         casters = {'str': lambda s: str(s),
                    'int': lambda i: int(i),
                    'float': lambda f: float(f), }
-        return casters[order]
+        return casters[value_type]
+
+    @classmethod
+    def _get_fraction(cls, min, max, value):
+        """
+        Determine the fraction od a value between a min and max
+        :param min: value which is fraction 0.0
+        :param max: value which is fraction 1.0
+        :param value: min <= value <= max
+        :return: value's fraction between min and max
+        """
+        if max == min:
+            return 0.0
+        return (value - min) / (max - min)
+
+    @classmethod
+    def _shade(cls, fraction, color1, color2):
+        """
+        Shades the color between color1 and color2, based on the given
+        fraction.
+        :param fraction: distance between color1 and color2.
+        :param color1: color string in either #rgb or #rrggbb format
+        :param color2:  color string in either #rgb or #rrggbb format
+        :return: new color string
+        """
+        cols = []
+        for c in [color1, color2]:
+            if len(c) == 4:
+                cols.append([16 * int(i, 16) for i in list(c[1:])])
+            elif len(c) == 7:
+                cols.append([int(c[1:3], 16),
+                             int(c[3:5], 16),
+                             int(c[5:7], 16)])
+            else:
+                raise ValueError('{}: Error: neither 4 nor 7 characters long'
+                                 ''.format(c))
+        shade = ['#']
+        for i in range(0, 3):
+            distance = cols[1][i] - cols[0][i]
+            shade.append('{:02x}'
+                         ''.format(int(cols[0][i] + distance * fraction)))
+        return ''.join(shade)
 
     @classmethod
     def _get_value_background(cls, config):
@@ -185,9 +226,18 @@ class Badge(object):
                 if caster:
                     thresholds = sorted(list(this['colors'].keys()),
                                         key=lambda v: caster(v))
+                    last = thresholds[0]
                     for threshold in thresholds:
                         if caster(config['value']) <= caster(threshold):
+                            if this.get('shade', None):
+                                fraction = cls._get_fraction(last,
+                                                             threshold,
+                                                             caster(config['value']))
+                                return cls._shade(fraction,
+                                                  this['colors'][last],
+                                                  this['colors'][threshold])
                             return this['colors'][threshold]
+                        last = threshold
                     return this['above']
             return this['colors'][config['value']]
         except KeyError:
